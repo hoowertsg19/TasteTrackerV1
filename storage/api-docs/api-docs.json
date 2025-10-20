@@ -1,0 +1,1307 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TasteTracker API",
+        "description": "API REST del restaurante para gestionar menú, pedidos, clientes y empleados.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "Servidor principal"
+        }
+    ],
+    "paths": {
+        "/api/v1/clientes": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Listar todos los clientes",
+                "description": "Obtiene el listado completo de clientes ordenado por nombre.",
+                "operationId": "275ddabe0ff3df657edd035747f2c43a",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Cliente"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Crear un nuevo cliente",
+                "description": "Crea un nuevo registro de cliente.",
+                "operationId": "d82cb60437b288da7843df7826fad22f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cliente creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/clientes/{cliente}": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Obtener un cliente",
+                "description": "Devuelve los detalles de un cliente específico.",
+                "operationId": "ab4ce3009d7508c93f86a31ca7afca31",
+                "parameters": [
+                    {
+                        "name": "cliente",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Actualizar un cliente",
+                "description": "Actualiza los datos de un cliente.",
+                "operationId": "d73c1716e55d5b6be632db863d3fda4d",
+                "parameters": [
+                    {
+                        "name": "cliente",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cliente actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Eliminar un cliente",
+                "description": "Elimina un registro de cliente.",
+                "operationId": "49710823fcda170cb253efe37c6339e6",
+                "parameters": [
+                    {
+                        "name": "cliente",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Actualizar parcialmente un cliente",
+                "description": "Actualiza uno o más campos de un cliente.",
+                "operationId": "35fb29443616cb1ce79ea894eb5c0c84",
+                "parameters": [
+                    {
+                        "name": "cliente",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cliente actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/empleados": {
+            "get": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Listar todos los empleados",
+                "description": "Obtiene el listado completo de empleados ordenado por nombre.",
+                "operationId": "389a1db12dba3f5baac5a7e86eaf194a",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Empleado"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Crear un nuevo empleado",
+                "description": "Crea un nuevo registro de empleado.",
+                "operationId": "30397d9c3a73c4a3d6745d291758328b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmpleadoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Empleado creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empleado"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/empleados/{empleado}": {
+            "get": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Obtener un empleado",
+                "description": "Devuelve los detalles de un empleado específico.",
+                "operationId": "bf11d45c3ab91aa206b3ad3c06fe4d96",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "description": "ID del empleado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Empleado encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empleado"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Actualizar un empleado",
+                "description": "Actualiza los datos de un empleado.",
+                "operationId": "66d5551460926a9fb33944b175866d06",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "description": "ID del empleado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmpleadoUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Empleado actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empleado"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Eliminar un empleado",
+                "description": "Elimina un registro de empleado.",
+                "operationId": "8c91ee03b3848ac67a1fa372d54d5738",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "description": "ID del empleado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Empleados"
+                ],
+                "summary": "Actualizar parcialmente un empleado",
+                "description": "Actualiza uno o más campos de un empleado.",
+                "operationId": "e6ba4d6516fe574f5a9449d32f52f09f",
+                "parameters": [
+                    {
+                        "name": "empleado",
+                        "in": "path",
+                        "description": "ID del empleado",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmpleadoUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Empleado actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Empleado"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/menu": {
+            "get": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Listar todos los productos del menú",
+                "description": "Obtiene una lista completa del catálogo de menú, ordenada por nombre.",
+                "operationId": "15b6e54bf7297bce4d05b3f6af0de21a",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Menu"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Crear un nuevo producto del menú",
+                "description": "Crea un producto en el catálogo del menú.",
+                "operationId": "06c9995aeb442009d7ee3b943de92f93",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MenuCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Producto creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Menu"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/menu/{menu}": {
+            "get": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Obtener un producto del menú",
+                "description": "Devuelve los detalles de un producto específico del menú.",
+                "operationId": "3cebd43d080fadb57fcdc6e8c228c827",
+                "parameters": [
+                    {
+                        "name": "menu",
+                        "in": "path",
+                        "description": "ID del producto del menú",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Menu"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Actualizar un producto del menú",
+                "description": "Actualiza campos de un producto del menú.",
+                "operationId": "ddb93d3528703e45c214352433cfad0f",
+                "parameters": [
+                    {
+                        "name": "menu",
+                        "in": "path",
+                        "description": "ID del producto del menú",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MenuUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Producto actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Menu"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Eliminar un producto del menú",
+                "description": "Elimina un producto del catálogo de menú.",
+                "operationId": "85327e4d1e4d06f2560b800b6aa90079",
+                "parameters": [
+                    {
+                        "name": "menu",
+                        "in": "path",
+                        "description": "ID del producto del menú",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Menu"
+                ],
+                "summary": "Actualizar parcialmente un producto del menú",
+                "description": "Actualiza uno o más campos de un producto del menú.",
+                "operationId": "5472142ae4a5b0b34fdfc6462dec88cc",
+                "parameters": [
+                    {
+                        "name": "menu",
+                        "in": "path",
+                        "description": "ID del producto del menú",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MenuUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Producto actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Menu"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/pedidos": {
+            "get": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Listar todos los pedidos",
+                "description": "Obtiene todos los pedidos con información del cliente y empleado (sin detalles).",
+                "operationId": "763c73f4fe562b79e809f8a4e332c4a8",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Pedido"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Crear un nuevo pedido con sus detalles",
+                "description": "Crea un pedido y sus detalles en una transacción atómica. Si algún detalle falla, todo se revierte.",
+                "operationId": "9ac38a0301bf52d679a30562d7588577",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PedidoCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pedido creado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pedido"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/pedidos/{pedido}": {
+            "get": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Obtener un pedido con sus relaciones",
+                "description": "Devuelve un pedido con cliente, empleado y detalles (incluyendo el menú de cada detalle).",
+                "operationId": "f1ab44575bbc487b45c15c364af56db1",
+                "parameters": [
+                    {
+                        "name": "pedido",
+                        "in": "path",
+                        "description": "ID del pedido",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pedido encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pedido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Actualizar el estado de un pedido",
+                "description": "Actualiza únicamente el estado del pedido (id_estado).",
+                "operationId": "98b0201bcc0ca983beec1ffed0716abe",
+                "parameters": [
+                    {
+                        "name": "pedido",
+                        "in": "path",
+                        "description": "ID del pedido",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_estado"
+                                ],
+                                "properties": {
+                                    "id_estado": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pedido actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pedido"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Eliminar un pedido",
+                "description": "Elimina un pedido. Los detalles asociados se eliminan en cascada.",
+                "operationId": "ba0fc0d0032163db9e5decf2deaad517",
+                "parameters": [
+                    {
+                        "name": "pedido",
+                        "in": "path",
+                        "description": "ID del pedido",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Eliminado"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Pedidos"
+                ],
+                "summary": "Actualizar parcialmente un pedido (estado)",
+                "description": "Actualiza el estado del pedido (id_estado).",
+                "operationId": "96093dafbe457c174a4681f33d9c2cdc",
+                "parameters": [
+                    {
+                        "name": "pedido",
+                        "in": "path",
+                        "description": "ID del pedido",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id_estado"
+                                ],
+                                "properties": {
+                                    "id_estado": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pedido actualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pedido"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Cliente": {
+                "required": [
+                    "nombre_cliente"
+                ],
+                "properties": {
+                    "id_cliente": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "nombre_cliente": {
+                        "type": "string",
+                        "example": "Ana López"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "example": "555-1234"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "example": "Calle 1 #123, Col. Centro"
+                    }
+                },
+                "type": "object"
+            },
+            "ClienteCreate": {
+                "required": [
+                    "nombre_cliente"
+                ],
+                "properties": {
+                    "nombre_cliente": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Ana López"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "maxLength": 30,
+                        "example": "555-1234"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Calle 1 #123, Col. Centro"
+                    }
+                },
+                "type": "object"
+            },
+            "ClienteUpdate": {
+                "properties": {
+                    "nombre_cliente": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Ana M. López"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "maxLength": 30,
+                        "example": "555-9876"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Av. Reforma 456"
+                    }
+                },
+                "type": "object"
+            },
+            "Empleado": {
+                "required": [
+                    "nombre_completo",
+                    "rol"
+                ],
+                "properties": {
+                    "id_empleado": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "nombre_completo": {
+                        "type": "string",
+                        "example": "Juan Pérez"
+                    },
+                    "rol": {
+                        "type": "string",
+                        "example": "Mesero"
+                    },
+                    "activo": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "EmpleadoCreate": {
+                "required": [
+                    "nombre_completo",
+                    "rol"
+                ],
+                "properties": {
+                    "nombre_completo": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Juan Pérez"
+                    },
+                    "rol": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "example": "Mesero"
+                    },
+                    "activo": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "EmpleadoUpdate": {
+                "properties": {
+                    "nombre_completo": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Juan P. Pérez"
+                    },
+                    "rol": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "example": "Cajero"
+                    },
+                    "activo": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "Menu": {
+                "required": [
+                    "nombre",
+                    "precio",
+                    "categoria"
+                ],
+                "properties": {
+                    "id_menu": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Hamburguesa Clásica"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 120
+                    },
+                    "categoria": {
+                        "type": "string",
+                        "example": "comidas"
+                    },
+                    "disponible": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "MenuCreate": {
+                "required": [
+                    "nombre",
+                    "precio",
+                    "categoria"
+                ],
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Té helado"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "format": "float",
+                        "minimum": 0,
+                        "example": 25.5
+                    },
+                    "categoria": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "example": "bebidas"
+                    },
+                    "disponible": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "MenuUpdate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "Té helado grande"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "format": "float",
+                        "minimum": 0,
+                        "example": 29
+                    },
+                    "categoria": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "example": "bebidas"
+                    },
+                    "disponible": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "PedidoDetalleInput": {
+                "required": [
+                    "id_menu",
+                    "cantidad",
+                    "precio_unitario"
+                ],
+                "properties": {
+                    "id_menu": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": 2
+                    },
+                    "precio_unitario": {
+                        "type": "number",
+                        "format": "float",
+                        "minimum": 0,
+                        "example": 120
+                    }
+                },
+                "type": "object"
+            },
+            "PedidoCreate": {
+                "required": [
+                    "id_cliente",
+                    "id_empleado",
+                    "detalles"
+                ],
+                "properties": {
+                    "id_cliente": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "id_empleado": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "numero_mesa": {
+                        "type": "string",
+                        "example": "A1"
+                    },
+                    "id_estado": {
+                        "description": "Opcional, por defecto 'Recibido'",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "detalles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PedidoDetalleInput"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PedidoDetalle": {
+                "properties": {
+                    "id_detalle": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 10
+                    },
+                    "id_pedido": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 5
+                    },
+                    "id_menu": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "cantidad": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "precio_unitario": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 120
+                    },
+                    "subtotal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 240
+                    },
+                    "menu": {
+                        "$ref": "#/components/schemas/Menu"
+                    }
+                },
+                "type": "object"
+            },
+            "Pedido": {
+                "properties": {
+                    "id_pedido": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 5
+                    },
+                    "id_cliente": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "id_empleado": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "id_estado": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "numero_mesa": {
+                        "type": "string",
+                        "example": "A1"
+                    },
+                    "fecha_creacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-15T12:34:56Z"
+                    },
+                    "total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 240
+                    },
+                    "cliente": {
+                        "$ref": "#/components/schemas/Cliente"
+                    },
+                    "empleado": {
+                        "$ref": "#/components/schemas/Empleado"
+                    },
+                    "detalles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PedidoDetalle"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Clientes",
+            "description": "Operaciones CRUD para la gestión de clientes"
+        },
+        {
+            "name": "Empleados",
+            "description": "Operaciones CRUD para la gestión de empleados"
+        },
+        {
+            "name": "Menu",
+            "description": "Operaciones CRUD para el catálogo de menú"
+        },
+        {
+            "name": "Pedidos",
+            "description": "Operaciones para gestionar pedidos y sus detalles"
+        }
+    ]
+}
