@@ -15,6 +15,7 @@ class Menu extends Model
         'precio',
         'categoria',
         'disponible',
+        'imagen_url',
     ];
 
     protected $casts = [

@@ -15,6 +15,14 @@ use OpenApi\Annotations as OA;
  *   url=L5_SWAGGER_CONST_HOST,
  *   description="Servidor principal"
  * )
+ *
+ * @OA\SecurityScheme(
+ *   securityScheme="sanctum",
+ *   type="apiKey",
+ *   in="header",
+ *   name="Authorization",
+ *   description="Usa 'Bearer <token>' para autenticar"
+ * )
  */
 class OpenApiSpec
 {

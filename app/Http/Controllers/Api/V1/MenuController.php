@@ -7,6 +7,7 @@ use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use OpenApi\Annotations as OA;
 
 /**
@@ -24,7 +25,8 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="nombre", type="string", example="Hamburguesa Clásica"),
  *     @OA\Property(property="precio", type="number", format="float", example=120.00),
  *     @OA\Property(property="categoria", type="string", example="comidas"),
- *     @OA\Property(property="disponible", type="boolean", example=true)
+ *     @OA\Property(property="disponible", type="boolean", example=true),
+ *     @OA\Property(property="imagen_url", type="string", nullable=true, example="menu_imagenes/abcd1234.jpg")
  *   }
  * )
  *
@@ -169,11 +171,15 @@ class MenuController extends Controller
      *   @OA\Response(response=404, description="No encontrado")
      * )
      *
-     * @OA\Patch(
-     *   path="/api/v1/menu/{menu}",
+    /**
+     * Subir imagen para un producto del menú.
+     *
+     * @OA\Post(
+     *   path="/api/v1/menu/{menu}/imagen",
      *   tags={"Menu"},
-     *   summary="Actualizar parcialmente un producto del menú",
-     *   description="Actualiza uno o más campos de un producto del menú.",
+     *   summary="Subir imagen de un producto del menú",
+     *   description="Sube una imagen (multipart/form-data) y actualiza el campo imagen_url del producto.",
+     *   security={{{"sanctum":{}}}},
      *   @OA\Parameter(
      *     name="menu",
      *     in="path",
@@ -183,32 +189,24 @@ class MenuController extends Controller
      *   ),
      *   @OA\RequestBody(
      *     required=true,
-     *     @OA\JsonContent(ref="#/components/schemas/MenuUpdate")
+     *     @OA\MediaType(
+     *       mediaType="multipart/form-data",
+     *       @OA\Schema(
+     *         type="object",
+     *         required={"imagen"},
+     *         @OA\Property(property="imagen", type="string", format="binary")
+     *       )
+     *     )
      *   ),
      *   @OA\Response(
      *     response=200,
-     *     description="Producto actualizado",
+     *     description="Imagen subida y producto actualizado",
      *     @OA\JsonContent(ref="#/components/schemas/Menu")
      *   ),
-     *   @OA\Response(response=422, description="Datos inválidos"),
-     *   @OA\Response(response=404, description="No encontrado")
+     *   @OA\Response(response=404, description="No encontrado"),
+     *   @OA\Response(response=422, description="Validación fallida")
      * )
      */
-    public function update(Request $request, Menu $menu)
-    {
-        $validated = $request->validate([
-            'nombre' => ['sometimes', 'required', 'string', 'max:255'],
-            'precio' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'categoria' => ['sometimes', 'required', 'string', 'max:100'],
-            'disponible' => ['sometimes', 'boolean'],
-        ]);
-
-        $menu->fill($validated);
-        // Si "disponible" viene como null explícito, no lo sobrescribimos
-        $menu->save();
-
-        return response()->json($menu, Response::HTTP_OK);
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -233,5 +231,64 @@ class MenuController extends Controller
     {
         $menu->delete();
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Subir imagen para un producto del menú.
+     *
+     * @OA\Post(
+     *   path="/api/v1/menu/{menu}/imagen",
+     *   tags={"Menu"},
+     *   summary="Subir imagen de un producto del menú",
+    *   description="Sube una imagen (multipart/form-data) y actualiza el campo imagen_url del producto.",
+    *   security={{"sanctum":{}}},
+     *   @OA\Parameter(
+     *     name="menu",
+     *     in="path",
+     *     description="ID del producto del menú",
+     *     required=true,
+     *     @OA\Schema(type="integer", format="int64")
+     *   ),
+    *   @OA\RequestBody(
+    *     required=true,
+    *     @OA\MediaType(
+    *       mediaType="multipart/form-data",
+    *       @OA\Schema(
+    *         type="object",
+    *         required={"imagen"},
+    *         @OA\Property(property="imagen", type="string", format="binary")
+    *       )
+    *     )
+    *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Imagen subida y producto actualizado",
+     *     @OA\JsonContent(ref="#/components/schemas/Menu")
+     *   ),
+     *   @OA\Response(response=404, description="No encontrado"),
+     *   @OA\Response(response=422, description="Validación fallida")
+     * )
+     */
+    public function subirImagen(Request $request, Menu $menu)
+    {
+        // Validación del archivo
+        $validated = $request->validate([
+            'imagen' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+        ]);
+
+        // Borrar imagen anterior si existe
+        if (!empty($menu->imagen_url)) {
+            // Intentar eliminar; si no existe, no falla
+            Storage::disk('public')->delete($menu->imagen_url);
+        }
+
+        // Guardar nueva imagen en el disco público
+        $path = $request->file('imagen')->store('menu_imagenes', 'public');
+
+        // Actualizar BD con el path de la imagen
+        $menu->imagen_url = $path;
+        $menu->save();
+
+        return response()->json($menu, Response::HTTP_OK);
     }
 }

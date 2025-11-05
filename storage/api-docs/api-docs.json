@@ -12,6 +12,135 @@
         }
     ],
     "paths": {
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar un nuevo usuario",
+                "operationId": "b9e746d77661fb8df55d0ac63e1ece77",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registrado"
+                    },
+                    "422": {
+                        "description": "Datos inválidos"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener un token de acceso",
+                "operationId": "a7997e7c1e3bfed64d4e56de82415931",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Autenticado"
+                    },
+                    "422": {
+                        "description": "Credenciales inválidas"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener usuario autenticado",
+                "operationId": "37d33f0281f67d31d05b4c45eea0143b",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Revocar el token actual",
+                "operationId": "f6b8957b4c0b25636613a9f0512a8ba9",
+                "responses": {
+                    "204": {
+                        "description": "Sin contenido"
+                    }
+                },
+                "security": [
+                    {
+                        "0": {
+                            "sanctum": []
+                        }
+                    }
+                ]
+            }
+        },
         "/api/v1/clientes": {
             "get": {
                 "tags": [
@@ -450,6 +579,67 @@
                 }
             }
         },
+        "/api/v1/estados-pedido": {
+            "get": {
+                "tags": [
+                    "Estados"
+                ],
+                "summary": "Listar estados de pedido",
+                "description": "Devuelve el catálogo de estados de pedido.",
+                "operationId": "391994435ee4f9cda429aa7d31746b69",
+                "responses": {
+                    "200": {
+                        "description": "Listado obtenido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EstadoPedido"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/estados-pedido/{id}": {
+            "get": {
+                "tags": [
+                    "Estados"
+                ],
+                "summary": "Obtener un estado de pedido",
+                "description": "Devuelve un estado del catálogo.",
+                "operationId": "2b69192feb9d6a45e2da402c96a0b168",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estado encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EstadoPedido"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                }
+            }
+        },
         "/api/v1/menu": {
             "get": {
                 "tags": [
@@ -544,54 +734,6 @@
                     }
                 }
             },
-            "put": {
-                "tags": [
-                    "Menu"
-                ],
-                "summary": "Actualizar un producto del menú",
-                "description": "Actualiza campos de un producto del menú.",
-                "operationId": "ddb93d3528703e45c214352433cfad0f",
-                "parameters": [
-                    {
-                        "name": "menu",
-                        "in": "path",
-                        "description": "ID del producto del menú",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/MenuUpdate"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Producto actualizado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Menu"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Datos inválidos"
-                    },
-                    "404": {
-                        "description": "No encontrado"
-                    }
-                }
-            },
             "delete": {
                 "tags": [
                     "Menu"
@@ -619,14 +761,16 @@
                         "description": "No encontrado"
                     }
                 }
-            },
-            "patch": {
+            }
+        },
+        "/api/v1/menu/{menu}/imagen": {
+            "post": {
                 "tags": [
                     "Menu"
                 ],
-                "summary": "Actualizar parcialmente un producto del menú",
-                "description": "Actualiza uno o más campos de un producto del menú.",
-                "operationId": "5472142ae4a5b0b34fdfc6462dec88cc",
+                "summary": "Subir imagen de un producto del menú",
+                "description": "Sube una imagen (multipart/form-data) y actualiza el campo imagen_url del producto.",
+                "operationId": "02a0bc816dc55eefa3ab3796bf2877cd",
                 "parameters": [
                     {
                         "name": "menu",
@@ -642,16 +786,25 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/MenuUpdate"
+                                "required": [
+                                    "imagen"
+                                ],
+                                "properties": {
+                                    "imagen": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Producto actualizado",
+                        "description": "Imagen subida y producto actualizado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -660,13 +813,18 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Datos inválidos"
-                    },
                     "404": {
                         "description": "No encontrado"
+                    },
+                    "422": {
+                        "description": "Validación fallida"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/pedidos": {
@@ -1047,6 +1205,20 @@
                 },
                 "type": "object"
             },
+            "EstadoPedido": {
+                "properties": {
+                    "id_estado": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "nombre_estado": {
+                        "type": "string",
+                        "example": "Recibido"
+                    }
+                },
+                "type": "object"
+            },
             "Menu": {
                 "required": [
                     "nombre",
@@ -1075,6 +1247,11 @@
                     "disponible": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "imagen_url": {
+                        "type": "string",
+                        "example": "menu_imagenes/abcd1234.jpg",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -1284,9 +1461,21 @@
                 },
                 "type": "object"
             }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Usa 'Bearer <token>' para autenticar",
+                "name": "Authorization",
+                "in": "header"
+            }
         }
     },
     "tags": [
+        {
+            "name": "Auth",
+            "description": "Autenticación con Sanctum"
+        },
         {
             "name": "Clientes",
             "description": "Operaciones CRUD para la gestión de clientes"
@@ -1294,6 +1483,10 @@
         {
             "name": "Empleados",
             "description": "Operaciones CRUD para la gestión de empleados"
+        },
+        {
+            "name": "Estados",
+            "description": "Catálogo de estados de pedido (solo lectura)"
         },
         {
             "name": "Menu",
