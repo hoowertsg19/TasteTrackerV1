@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             EstadoPedidoSeeder::class,
             MenuSeeder::class,
+            EmpleadoSeeder::class,
+            ClienteSeeder::class,
         ]);
     }
 }

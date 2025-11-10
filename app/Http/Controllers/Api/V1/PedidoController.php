@@ -7,8 +7,11 @@ use App\Models\Pedido;
 use App\Models\DetallePedido;
 use App\Models\EstadoPedido;
 use Illuminate\Http\Request;
+use App\Http\Requests\Pedido\StorePedidoRequest;
+use App\Http\Requests\Pedido\UpdatePedidoRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\PedidoResource;
 use OpenApi\Annotations as OA;
 
 /**
@@ -95,8 +98,10 @@ class PedidoController extends Controller
      */
     public function index()
     {
-        $items = Pedido::with(['cliente', 'empleado'])->orderByDesc('id_pedido')->get();
-        return response()->json($items, Response::HTTP_OK);
+        $items = Pedido::with(['cliente', 'empleado', 'estado', 'detalles.menu'])
+            ->orderByDesc('id_pedido')
+            ->get();
+        return PedidoResource::collection($items);
     }
 
     /**
@@ -119,18 +124,9 @@ class PedidoController extends Controller
      *   @OA\Response(response=422, description="Datos inválidos")
      * )
      */
-    public function store(Request $request)
+    public function store(StorePedidoRequest $request)
     {
-        $validated = $request->validate([
-            'id_cliente' => ['required', 'integer', 'exists:clientes,id_cliente'],
-            'id_empleado' => ['required', 'integer', 'exists:empleados,id_empleado'],
-            'numero_mesa' => ['nullable', 'string', 'max:50'],
-            'id_estado' => ['sometimes', 'integer', 'exists:estado_pedido,id_estado'],
-            'detalles' => ['required', 'array', 'min:1'],
-            'detalles.*.id_menu' => ['required', 'integer', 'exists:menu,id_menu'],
-            'detalles.*.cantidad' => ['required', 'integer', 'min:1'],
-            'detalles.*.precio_unitario' => ['required', 'numeric', 'min:0'],
-        ]);
+        $validated = $request->validated();
 
         $pedido = DB::transaction(function () use ($validated) {
             // Determinar estado por defecto 'Recibido' si no se envió
@@ -171,8 +167,10 @@ class PedidoController extends Controller
             return $pedido;
         });
 
-        $pedido->load(['cliente', 'empleado', 'detalles.menu']);
-        return response()->json($pedido, Response::HTTP_CREATED);
+        $pedido->load(['cliente', 'empleado', 'estado', 'detalles.menu']);
+        return (new PedidoResource($pedido))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -200,8 +198,8 @@ class PedidoController extends Controller
      */
     public function show(Pedido $pedido)
     {
-        $pedido->load(['cliente', 'empleado', 'detalles.menu']);
-        return response()->json($pedido, Response::HTTP_OK);
+        $pedido->load(['cliente', 'empleado', 'estado', 'detalles.menu']);
+        return new PedidoResource($pedido);
     }
 
     /**
@@ -257,17 +255,15 @@ class PedidoController extends Controller
      *   @OA\Response(response=404, description="No encontrado")
      * )
      */
-    public function update(Request $request, Pedido $pedido)
+    public function update(UpdatePedidoRequest $request, Pedido $pedido)
     {
-        $validated = $request->validate([
-            'id_estado' => ['required', 'integer', 'exists:estado_pedido,id_estado'],
-        ]);
+        $validated = $request->validated();
 
         $pedido->id_estado = $validated['id_estado'];
         $pedido->save();
 
-        $pedido->load(['cliente', 'empleado', 'detalles.menu']);
-        return response()->json($pedido, Response::HTTP_OK);
+        $pedido->load(['cliente', 'empleado', 'estado', 'detalles.menu']);
+        return new PedidoResource($pedido);
     }
 
     /**

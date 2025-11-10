@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use App\Http\Resources\ClienteResource;
+use App\Http\Requests\Cliente\StoreClienteRequest;
+use App\Http\Requests\Cliente\UpdateClienteRequest;
 use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
 
@@ -67,7 +70,7 @@ class ClienteController extends Controller
     public function index()
     {
         $items = Cliente::query()->orderBy('nombre_cliente')->get();
-        return response()->json($items, Response::HTTP_OK);
+        return ClienteResource::collection($items);
     }
 
     /**
@@ -90,16 +93,14 @@ class ClienteController extends Controller
      *   @OA\Response(response=422, description="Datos inválidos")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreClienteRequest $request)
     {
-        $validated = $request->validate([
-            'nombre_cliente' => ['required', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
-            'direccion' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         $cliente = Cliente::create($validated);
-        return response()->json($cliente, Response::HTTP_CREATED);
+        return (new ClienteResource($cliente))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -128,7 +129,7 @@ class ClienteController extends Controller
     public function show(string $id)
     {
         $cliente = Cliente::findOrFail($id);
-        return response()->json($cliente, Response::HTTP_OK);
+        return new ClienteResource($cliente);
     }
 
     /**
@@ -184,19 +185,15 @@ class ClienteController extends Controller
      *   @OA\Response(response=404, description="No encontrado")
      * )
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateClienteRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'nombre_cliente' => ['sometimes', 'required', 'string', 'max:255'],
-            'telefono' => ['nullable', 'string', 'max:30'],
-            'direccion' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         $cliente = Cliente::findOrFail($id);
         $cliente->fill($validated);
         $cliente->save();
 
-        return response()->json($cliente, Response::HTTP_OK);
+        return new ClienteResource($cliente);
     }
 
     /**

@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use App\Http\Requests\Menu\StoreMenuRequest;
+use App\Http\Requests\Menu\UpdateMenuRequest;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\MenuResource;
 use OpenApi\Annotations as OA;
 
 /**
@@ -73,7 +76,7 @@ class MenuController extends Controller
     public function index()
     {
         $items = Menu::query()->orderBy('nombre')->get();
-        return response()->json($items, Response::HTTP_OK);
+        return MenuResource::collection($items);
     }
 
     /**
@@ -96,14 +99,9 @@ class MenuController extends Controller
      *   @OA\Response(response=422, description="Datos inválidos")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreMenuRequest $request)
     {
-        $validated = $request->validate([
-            'nombre' => ['required', 'string', 'max:255'],
-            'precio' => ['required', 'numeric', 'min:0'],
-            'categoria' => ['required', 'string', 'max:100'],
-            'disponible' => ['sometimes', 'boolean'],
-        ]);
+        $validated = $request->validated();
 
         $menu = Menu::create([
             'nombre' => $validated['nombre'],
@@ -112,7 +110,9 @@ class MenuController extends Controller
             'disponible' => $validated['disponible'] ?? true,
         ]);
 
-        return response()->json($menu, Response::HTTP_CREATED);
+        return (new MenuResource($menu))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -140,7 +140,19 @@ class MenuController extends Controller
      */
     public function show(Menu $menu)
     {
-        return response()->json($menu, Response::HTTP_OK);
+        return new MenuResource($menu);
+    }
+
+    /**
+     * Actualizar un producto del menú.
+     */
+    public function update(UpdateMenuRequest $request, Menu $menu)
+    {
+        $validated = $request->validated();
+        $menu->fill($validated);
+        $menu->save();
+
+        return new MenuResource($menu);
     }
 
     /**
@@ -289,6 +301,6 @@ class MenuController extends Controller
         $menu->imagen_url = $path;
         $menu->save();
 
-        return response()->json($menu, Response::HTTP_OK);
+        return new MenuResource($menu);
     }
 }

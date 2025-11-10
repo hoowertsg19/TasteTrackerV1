@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EstadoPedido;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\EstadoPedidoResource;
 use OpenApi\Annotations as OA;
 
 /**
@@ -43,7 +44,7 @@ class EstadoPedidoController extends Controller
         $items = Cache::remember('estados_pedido', 600, function () {
             return EstadoPedido::query()->orderBy('nombre_estado')->get();
         });
-        return response()->json($items, Response::HTTP_OK);
+        return EstadoPedidoResource::collection($items);
     }
 
     /**
@@ -60,6 +61,6 @@ class EstadoPedidoController extends Controller
     public function show(string $id)
     {
         $estado = EstadoPedido::findOrFail($id);
-        return response()->json($estado, Response::HTTP_OK);
+        return new EstadoPedidoResource($estado);
     }
 }

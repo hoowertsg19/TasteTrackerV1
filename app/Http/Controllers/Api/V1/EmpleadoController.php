@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Empleado;
 use Illuminate\Http\Request;
+use App\Http\Resources\EmpleadoResource;
+use App\Http\Requests\Empleado\StoreEmpleadoRequest;
+use App\Http\Requests\Empleado\UpdateEmpleadoRequest;
 use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
 
@@ -67,7 +70,7 @@ class EmpleadoController extends Controller
     public function index()
     {
         $items = Empleado::query()->orderBy('nombre_completo')->get();
-        return response()->json($items, Response::HTTP_OK);
+        return EmpleadoResource::collection($items);
     }
 
     /**
@@ -90,13 +93,9 @@ class EmpleadoController extends Controller
      *   @OA\Response(response=422, description="Datos inválidos")
      * )
      */
-    public function store(Request $request)
+    public function store(StoreEmpleadoRequest $request)
     {
-        $validated = $request->validate([
-            'nombre_completo' => ['required', 'string', 'max:255'],
-            'rol' => ['required', 'string', 'max:100'],
-            'activo' => ['sometimes', 'boolean'],
-        ]);
+        $validated = $request->validated();
 
         $empleado = Empleado::create([
             'nombre_completo' => $validated['nombre_completo'],
@@ -104,7 +103,9 @@ class EmpleadoController extends Controller
             'activo' => $validated['activo'] ?? true,
         ]);
 
-        return response()->json($empleado, Response::HTTP_CREATED);
+        return (new EmpleadoResource($empleado))
+            ->response()
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -133,7 +134,7 @@ class EmpleadoController extends Controller
     public function show(string $id)
     {
         $empleado = Empleado::findOrFail($id);
-        return response()->json($empleado, Response::HTTP_OK);
+        return new EmpleadoResource($empleado);
     }
 
     /**
@@ -189,19 +190,15 @@ class EmpleadoController extends Controller
      *   @OA\Response(response=404, description="No encontrado")
      * )
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateEmpleadoRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'nombre_completo' => ['sometimes', 'required', 'string', 'max:255'],
-            'rol' => ['sometimes', 'required', 'string', 'max:100'],
-            'activo' => ['sometimes', 'boolean'],
-        ]);
+        $validated = $request->validated();
 
         $empleado = Empleado::findOrFail($id);
         $empleado->fill($validated);
         $empleado->save();
 
-        return response()->json($empleado, Response::HTTP_OK);
+        return new EmpleadoResource($empleado);
     }
 
     /**

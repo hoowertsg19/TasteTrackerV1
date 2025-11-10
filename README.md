@@ -1,61 +1,149 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TasteTracker – API REST para gestión de pedidos en restaurantes
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+TasteTracker es una API REST construida con Laravel que permite gestionar el menú, los pedidos, los clientes y los empleados de un restaurante. Incluye autenticación con tokens (Sanctum), validación robusta, respuestas estandarizadas y documentación automática.
 
-## About Laravel
+## Características principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Autenticación con Laravel Sanctum (tokens Bearer) y endpoints públicos para registro/login.
+- CRUD completo para: menú, empleados, clientes y pedidos.
+- Validación sólida mediante Form Requests.
+- Respuestas JSON consistentes con API Resources (incluye anidamiento de relaciones).
+- Documentación Swagger/OpenAPI generada automáticamente (l5-swagger).
+- Subida de imágenes para ítems del menú (disco `public`).
+- Suite de pruebas de Feature con 18 tests pasando (Auth, Menu, Pedido, Empleado).
+- Versionado de API: v1 bajo el prefijo `/api/v1`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tecnologías utilizadas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel 12 (PHP ^8.2)
+- PHP 8.2+
+- MySQL
+- Laravel Sanctum
+- Swagger/OpenAPI (l5-swagger)
+- PHPUnit
 
-## Learning Laravel
+## Requisitos previos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.2 o superior
+- Composer
+- MySQL (u otro motor compatible)
+- Servidor web (Apache/Nginx) o `php artisan serve`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Instalación paso a paso
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1) Clonar el repositorio
+```bash
+git clone <url-del-repo>
+cd TasteTrackerV1
+```
 
-## Laravel Sponsors
+2) Instalar dependencias
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3) Copiar variables de entorno y generar clave
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+4) Configurar base de datos en `.env`
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tastetracker
+DB_USERNAME=usuario
+DB_PASSWORD=clave
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+5) Ejecutar migraciones y seeders
+```bash
+php artisan migrate
+php artisan db:seed
+```
+Nota: los seeders crean el catálogo de estados de pedido y un menú inicial.
 
-## Contributing
+6) Enlazar el almacenamiento público (para imágenes)
+```bash
+php artisan storage:link
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7) Iniciar el servidor
+```bash
+php artisan serve
+```
+La API estará disponible (por defecto) en `http://localhost:8000`.
 
-## Code of Conduct
+## Configuración del entorno
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Variables relevantes en `.env`:
 
-## Security Vulnerabilities
+- `APP_URL` (ej. `http://localhost:8000`)
+- `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+- `SANCTUM_STATEFUL_DOMAINS` (si usas un frontend SPA en el mismo dominio)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Para endpoints protegidos usa el encabezado:
+```
+Authorization: Bearer <token>
+```
 
-## License
+## Documentación de la API (Swagger)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Generar/actualizar especificación:
+```bash
+php artisan l5-swagger:generate
+```
+UI disponible en:
+
+- `GET {APP_URL}/api/documentation`
+
+Endpoints públicos:
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/estados-pedido`
+
+Endpoints protegidos (requieren token Bearer): resto de recursos bajo `/api/v1`.
+
+## Endpoints principales
+
+| Método | Ruta                              | Descripción                                   | Auth |
+|-------:|-----------------------------------|-----------------------------------------------|:----:|
+| POST   | `/api/v1/auth/register`           | Registro de usuario                           |  No  |
+| POST   | `/api/v1/auth/login`              | Login (retorna token)                         |  No  |
+| GET    | `/api/v1/auth/me`                 | Perfil del usuario autenticado                | Sí   |
+| GET    | `/api/v1/menu`                    | Listar menú                                   | Sí   |
+| POST   | `/api/v1/menu`                    | Crear ítem de menú                            | Sí   |
+| POST   | `/api/v1/menu/{id}/imagen`        | Subir imagen de ítem de menú                  | Sí   |
+| GET    | `/api/v1/pedidos`                 | Listar pedidos (con relaciones)               | Sí   |
+| POST   | `/api/v1/pedidos`                 | Crear pedido con detalles                     | Sí   |
+| GET    | `/api/v1/estados-pedido`          | Listar estados de pedido                      |  No  |
+
+Nota: Existen también los endpoints CRUD para `empleados` y `clientes` bajo `/api/v1/empleados` y `/api/v1/clientes` (protegidos).
+
+## Testing
+
+Ejecutar la suite de pruebas:
+```bash
+php artisan test
+```
+Estado actual: 18 tests pasando (cubre autenticación, autorización, CRUD y validación en endpoints clave).
+
+## Estructura del proyecto (carpetas clave)
+
+- `app/Http/Controllers/Api/V1` — Controladores de la API v1
+- `app/Http/Requests` — Form Requests para validación
+- `app/Http/Resources` — API Resources para respuestas JSON
+- `app/Models` — Modelos Eloquent
+- `routes/api.php` — Definición de rutas de la API
+- `tests/Feature` — Pruebas de Feature (Auth, Menu, Pedido, Empleado)
+
+## Autores
+
+- Hoowerts Gross
+- Antony Maltez
+- Jorge Rodriguez
+- Norman Acevedo
+
