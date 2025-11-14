@@ -12,6 +12,8 @@ Route::prefix('v1')->group(function () {
     // Auth (públicas)
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+    Route::get('auth/check-email', [AuthController::class, 'checkEmail'])
+        ->middleware('throttle:10,1');
 
     // Estados de pedido (solo lectura, públicas)
     Route::get('estados-pedido', [EstadoPedidoController::class, 'index']);

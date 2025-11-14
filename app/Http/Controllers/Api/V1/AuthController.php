@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
 
@@ -106,5 +107,55 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()?->delete();
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Verificar si un email está registrado (endpoint público, sin auth).
+     */
+    public function checkEmail(Request $request)
+    {
+        try {
+            $rawEmail = $request->query('email');
+
+            if ($rawEmail === null || trim($rawEmail) === '') {
+                return response()->json([
+                    'exists' => false,
+                    'message' => 'Email no proporcionado',
+                ], 400);
+            }
+
+            $email = trim(mb_strtolower($rawEmail));
+
+            // Validación básica de formato (opcional pero útil)
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return response()->json([
+                    'exists' => false,
+                    'message' => 'Email no proporcionado',
+                ], 400);
+            }
+
+            $exists = User::whereRaw('LOWER(email) = ?', [$email])->exists();
+
+            Log::info('Auth check-email', [
+                'email' => $email,
+                'exists' => $exists,
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'exists' => $exists,
+                'message' => $exists ? 'Email registrado' : 'Email no registrado',
+            ], 200);
+        } catch (\Throwable $e) {
+            Log::error('Auth check-email error', [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'exists' => false,
+                'message' => 'Error del servidor',
+            ], 500);
+        }
     }
 }
