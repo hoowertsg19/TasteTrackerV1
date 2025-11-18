@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Annotations as OA;
 
@@ -91,7 +94,22 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
-        return response()->json($request->user(), Response::HTTP_OK);
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'No autenticado',
+            ], 401);
+        }
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'created_at' => $user->created_at,
+            ],
+        ], 200);
     }
 
     /**
@@ -107,6 +125,73 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()?->delete();
         return response()->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Solicitar recuperación de contraseña (envía email)
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Si el email está registrado, recibirás un enlace de recuperación',
+            ], 200);
+        }
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json([
+                'message' => 'Enlace de recuperación enviado a tu email',
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Error al enviar el enlace de recuperación',
+        ], 500);
+    }
+
+    /**
+     * Restablecer contraseña con token
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json([
+                'message' => 'Contraseña actualizada exitosamente',
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => __($status),
+        ], 400);
     }
 
     /**
